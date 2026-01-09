@@ -3,13 +3,22 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # 强制使用 ubuntu-20.04 (这是最稳定、兼容性最好的版本)
+    runs-on: ubuntu-20.04
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # 新增步骤：清理服务器垃圾文件，释放空间，防止打包中途卡死
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       - name: Build with Buildozer
-        # 使用别人做好的成熟打包环境，省去配置烦恼
         uses: ArtemSBulgakov/buildozer-action@v1
         id: buildozer
         with:
